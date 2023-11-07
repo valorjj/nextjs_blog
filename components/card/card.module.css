@@ -1,0 +1,54 @@
+/** @format */
+
+.container {
+	margin-bottom: 50px;
+	display: flex;
+	align-items: center;
+	gap: 50px;
+}
+
+.imgContainer {
+	flex: 1;
+	height: 350px;
+	position: relative;
+}
+
+.textContainer {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+}
+
+.image {
+	object-fit: cover;
+}
+
+.date {
+	color: gray;
+}
+
+.category {
+	color: crimson;
+	font-weight: 500;
+}
+
+.desc {
+	font-size: 18px;
+	font-weight: 300;
+	color: var(--soft-text-color);
+}
+
+.link {
+	border-bottom: 1px solid crimson;
+	width: max-content;
+	padding: 2px 0;
+}
+
+@media screen and (max-width: 1280px) {
+	.imgContainer {
+		display: none;
+	}
+}
+
+
