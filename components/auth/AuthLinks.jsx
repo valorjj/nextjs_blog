@@ -10,6 +10,10 @@ export default function AuthLinks() {
 	const [open, setOpen] = useState(false);
 	const { status } = useSession();
 
+	if (typeof window === "undefined") {
+		return null;
+	}
+
 	return (
 		<>
 			{status === "unauthenticated" ? (

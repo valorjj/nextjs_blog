@@ -206,7 +206,7 @@ export const GET = async (req) => {
 
 	try {
 		const comments = await prisma.comment.findMany({
-			
+
 			where: {
 				...(postSlug && { postSlug }),
 			},
@@ -214,3 +214,17 @@ export const GET = async (req) => {
 		});
 }
 ```
+
+### npx prisma generate
+
+![image](https://user-images.githubusercontent.com/30681841/281375961-f3a09b00-d520-45ad-a208-e891be5d7330.png)
+
+## Vercel 배포 (진행중)
+
+여러 삽질 중, 아래 오류를 만났다.
+
+```bash
+Error occurred prerendering page "/write". Read more: https://nextjs.org/docs/messages/prerender-error
+```
+
+ReactQuill 이라는 라이브러리를 사용하여 글 작성하는 페이지인데, 오류가 난다.

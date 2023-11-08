@@ -1,10 +1,10 @@
 /** @format */
+
 "use client";
 
 import Image from "next/image";
 import styles from "./writePage.module.css";
-import React, { use, useEffect, useState } from "react";
-import ReactQuill from "react-quill";
+import { useEffect, useState } from "react";
 import "react-quill/dist/quill.bubble.css";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -15,26 +15,27 @@ import {
 	getDownloadURL,
 } from "firebase/storage";
 import { app } from "@/utils/firebase";
+import ReactQuill from "react-quill";
 
 const WritePage = () => {
 	const { status } = useSession();
 	const router = useRouter();
-	const [file, setFile] = useState(null);
+
 	const [open, setOpen] = useState(false);
+	const [file, setFile] = useState(null);
 	const [media, setMedia] = useState("");
 	const [value, setValue] = useState("");
 	const [title, setTitle] = useState("");
 	const [catSlug, setCatSlug] = useState("");
 
-	// file 의 상태가 바뀌면 (파일이 업로드되면)
 	useEffect(() => {
 		const storage = getStorage(app);
 		const upload = () => {
-			// 유니크한 이름 부여
-			const name = new Date().getTime + file.name;
+			const name = new Date().getTime() + file.name;
 			const storageRef = ref(storage, name);
 
 			const uploadTask = uploadBytesResumable(storageRef, file);
+
 			uploadTask.on(
 				"state_changed",
 				(snapshot) => {
@@ -64,22 +65,19 @@ const WritePage = () => {
 		file && upload();
 	}, [file]);
 
-	// [숙제] 로딩 페이지 스타일 만들기
 	if (status === "loading") {
-		return <div className={styles.loading}>Now loading...</div>;
+		return <div className={styles.loading}>Loading...</div>;
 	}
 
 	if (status === "unauthenticated") {
 		router.push("/");
 	}
 
-	// 한글 입력 시 값이 제대로 안들어감
-	// -> 한글 수정
 	const slugify = (str) =>
 		str
 			.toLowerCase()
 			.trim()
-			.replace(/[^ㄱ-ㅎㅏ-ㅣ가-헿\w\s-]+/g, "")
+			.replace(/[^\w\s-]/g, "")
 			.replace(/[\s_-]+/g, "-")
 			.replace(/^-+|-+$/g, "");
 
@@ -91,11 +89,14 @@ const WritePage = () => {
 				desc: value,
 				img: media,
 				slug: slugify(title),
-				catSlug: catSlug || "coding",
+				catSlug: catSlug || "style", //If not selected, choose the general category
 			}),
 		});
 
-		console.log(res);
+		if (res.status === 200) {
+			const data = await res.json();
+			router.push(`/posts/${data.slug}`);
+		}
 	};
 
 	return (
@@ -137,7 +138,6 @@ const WritePage = () => {
 							onChange={(e) => setFile(e.target.files[0])}
 							style={{ display: "none" }}
 						/>
-
 						<button className={styles.addButton}>
 							<label htmlFor='image'>
 								<Image
@@ -148,7 +148,6 @@ const WritePage = () => {
 								/>
 							</label>
 						</button>
-
 						<button className={styles.addButton}>
 							<Image
 								src='/external.png'
@@ -167,13 +166,17 @@ const WritePage = () => {
 						</button>
 					</div>
 				)}
-				<ReactQuill
-					theme='bubble'
-					value={value}
-					onChange={setValue}
-					placeholder='Tell your story'
-					className={styles.textArea}
-				/>
+				{typeof document !== "undefined" ? (
+					<ReactQuill
+						className={styles.textArea}
+						theme='bubble'
+						value={value}
+						onChange={setValue}
+						placeholder='Tell your story...'
+					/>
+				) : (
+					<h1>loading</h1>
+				)}
 			</div>
 			<button
 				className={styles.publish}
