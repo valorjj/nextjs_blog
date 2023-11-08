@@ -7,7 +7,7 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-		"vercel-build": "prisma init --datasource-provider mongodb && prisma generate && prisma migrate deploy && next build",
+		"vercel-build": "prisma generate && prisma migrate deploy && next build",
 		"postinstall": "prisma generate",
 		"prisma:generate": "prisma generate"
 	},
