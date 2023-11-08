@@ -5,33 +5,32 @@ import styles from "./card.module.css";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Card() {
+export default function Card({ key, item }) {
 	return (
 		<div className={styles.container}>
-			<div className={styles.imgContainer}>
-				<Image
-					className={styles.image}
-					src='/p1.jpeg'
-					alt=''
-					fill
-				/>
-			</div>
+			{item.img && (
+				<div className={styles.imgContainer}>
+					<Image
+						className={styles.image}
+						src={item.img}
+						alt=''
+						fill
+					/>
+				</div>
+			)}
 			<div className={styles.textContainer}>
 				<div className={styles.detail}>
-					<span className={styles.date}>2023.11.06 - </span>
-					<span className={styles.category}>CODING</span>
+					<span className={styles.date}>
+						{item.createdAt.substring(0, 10)} -{" "}
+					</span>
+					<span className={styles.category}>{item.catSlug}</span>
 				</div>
-				<Link href='/'>
-					<h1>this is just a test title</h1>
+				<Link href={`/posts/${item.slug}`}>
+					<h1>{item.title}</h1>
 				</Link>
-				<p className={styles.desc}>
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem
-					ratione eligendi inventore nesciunt ad doloremque explicabo
-					iste nemo quis eveniet, iure ea similique nisi reprehenderit
-					accusantium voluptatem exercitationem ullam. Sunt!
-				</p>
+				<p className={styles.desc}>{item.desc.substring(0, 60)}</p>
 				<Link
-					href='/'
+					href={`/posts/${item.slug}`}
 					className={styles.link}
 				>
 					Read More

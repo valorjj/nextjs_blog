@@ -4,15 +4,15 @@
 import React, { useState } from "react";
 import styles from "./authLinks.module.css";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 export default function AuthLinks() {
 	const [open, setOpen] = useState(false);
-	// 임시변수
-	const status = "authenticated";
+	const { status } = useSession();
 
 	return (
 		<>
-			{status === "notauthenticated" ? (
+			{status === "unauthenticated" ? (
 				<Link
 					href='/login'
 					className={styles.link}
@@ -27,7 +27,12 @@ export default function AuthLinks() {
 					>
 						Write
 					</Link>
-					<span className={styles.link}>Logout</span>
+					<span
+						className={styles.link}
+						onClick={signOut}
+					>
+						Logout
+					</span>
 				</>
 			)}
 
