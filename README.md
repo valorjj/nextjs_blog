@@ -231,6 +231,18 @@ Error occurred prerendering page "/write". Read more: https://nextjs.org/docs/me
 
 따라서, 모든 요소가 로드된 이후에 ReactQuill 을 불러오도록 하면 된다. 
 
-다른 사람들도 동일한 문제를 겪었고, 몇 가지 해결책을 시도해보았다.
-
-첫번째, `dynamic` 사용하기
+## 배포 결과
+```bash
+Route (app)                              Size     First Load JS
+┌ λ /                                    1.26 kB        97.5 kB
+├ ○ /_not-found                          882 B          84.6 kB
+├ λ /api/auth/[...nextauth]              0 B                0 B
+├ ○ /api/categories                      0 B                0 B
+├ λ /api/comments                        0 B                0 B
+├ λ /api/posts                           0 B                0 B
+├ λ /api/posts/[slug]                    0 B                0 B
+├ λ /blog                                1.04 kB        97.3 kB
+├ ○ /login                               1 kB           95.7 kB
+├ λ /posts/[slug]                        6.93 kB         114 kB
+└ ○ /write                               20.9 kB         121 kB
+```
