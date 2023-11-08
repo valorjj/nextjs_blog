@@ -227,4 +227,10 @@ export const GET = async (req) => {
 Error occurred prerendering page "/write". Read more: https://nextjs.org/docs/messages/prerender-error
 ```
 
-ReactQuill 이라는 라이브러리를 사용하여 글 작성하는 페이지인데, 오류가 난다.
+`ReactQuill` 이라는 라이브러리를 사용하여 글 작성하는 페이지인데, 오류가 난다. 폭풍 검색을 통해 ReactQuill 은 document 를 조작하는데 Next.js 에서 pre-rendering 되는 값이 중간에 바뀌기 때문에 오류를 출력한다.
+
+따라서, 모든 요소가 로드된 이후에 ReactQuill 을 불러오도록 하면 된다. 
+
+다른 사람들도 동일한 문제를 겪었고, 몇 가지 해결책을 시도해보았다.
+
+첫번째, `dynamic` 사용하기
