@@ -7,7 +7,7 @@ import Image from "next/image";
 import MenuPosts from "../menuPosts/menuPosts";
 import MenuCategories from "../menuCategories/MenuCategories";
 
-export default function Menu() {
+const Menu = () => {
 	return (
 		<div className={styles.container}>
 			<h2 className={styles.subtitle}>What`s hot</h2>
@@ -23,4 +23,6 @@ export default function Menu() {
 			<MenuPosts withImage={true} />
 		</div>
 	);
-}
+};
+
+export default Menu;
