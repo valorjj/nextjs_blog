@@ -29,6 +29,7 @@
 		"swr": "^2.2.4"
 	},
 	"devDependencies": {
+		"encoding": "^0.1.13",
 		"eslint": "^8",
 		"eslint-config-next": "13.5.6"
 	}

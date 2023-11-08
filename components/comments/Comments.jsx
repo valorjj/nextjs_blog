@@ -5,16 +5,16 @@
 import Link from "next/link";
 import styles from "./comments.module.css";
 import Image from "next/image";
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
-
 const fetcher = async (url) => {
-	const response = await fetch(url);
-	const data = await response.json();
+	const res = await fetch(url);
 
-	if (!response.ok) {
+	const data = await res.json();
+
+	if (!res.ok) {
 		const error = new Error(data.message);
 		throw error;
 	}
