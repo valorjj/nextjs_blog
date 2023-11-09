@@ -4,7 +4,7 @@
 
 import Image from 'next/image';
 import styles from './writePage.module.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import 'react-quill/dist/quill.bubble.css';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -82,6 +82,7 @@ const WritePage = () => {
 			.replace(/^-+|-+$/g, '');
 
 	const handleSubmit = async () => {
+		setValue(value);
 		try {
 			const res = await fetch('/api/posts', {
 				method: 'POST',
@@ -174,7 +175,6 @@ const WritePage = () => {
 					className={styles.textArea}
 					theme='bubble'
 					value={value}
-					onChange={setValue}
 					placeholder='Tell your story...'
 				/>
 			</div>

@@ -1,23 +1,27 @@
 /** @format */
 
-import React from "react";
-import styles from "./cardlist.module.css";
-import Pagination from "../pagination/Pagination";
-import Image from "next/image";
-import Card from "../card/Card";
+import React from 'react';
+import styles from './cardList.module.css';
+import Pagination from '../pagination/Pagination';
+import Image from 'next/image';
+import Card from '../card/Card';
 
 const getData = async (page, cat) => {
-	const response = await fetch(
-		`http://localhost:3000/api/posts?page=${page}&cat=${cat || ""}`,
+	const res = await fetch(
+		`http://localhost:3000/api/posts?page=${page}&cat=${cat || ''}`,
 		{
-			cache: "no-store",
+			cache: 'no-store',
 		}
 	);
-	if (!response.ok) throw new Error("Failed");
-	return response.json();
+
+	if (!res.ok) {
+		throw new Error('Failed');
+	}
+
+	return res.json();
 };
 
-export default async function CardList({ page, cat }) {
+const CardList = async ({ page, cat }) => {
 	const { posts, count } = await getData(page, cat);
 
 	const POST_PER_PAGE = 2;
@@ -43,4 +47,6 @@ export default async function CardList({ page, cat }) {
 			/>
 		</div>
 	);
-}
+};
+
+export default CardList;

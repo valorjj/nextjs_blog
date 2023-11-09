@@ -14,18 +14,16 @@ export default function Featured() {
 				<div className={styles.imgContainer}>
 					<Image
 						className={styles.image}
-						src='/a.png'
+						src='/p1.jpeg'
 						alt=''
 						fill
 					></Image>
 				</div>
 				<div className={styles.textContainer}>
 					<h1 className={styles.postTitle}>
-						저만의 작은 블로그입니다.
+						Next.js 학습용 교보재입니다.
 					</h1>
-					<p className={styles.postDesc}>
-						매일 1% 발전하려고 노력하고있습니다.
-					</p>
+					<p className={styles.postDesc}>감사합니다.</p>
 					{/* <button className={styles.button}>Read More</button> */}
 				</div>
 			</div>

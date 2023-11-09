@@ -43,12 +43,6 @@ export default function Navbar() {
 					href='/'
 					className={styles.link}
 				>
-					Github
-				</Link>
-				<Link
-					href='/'
-					className={styles.link}
-				>
 					About
 				</Link>
 				<Auth />
