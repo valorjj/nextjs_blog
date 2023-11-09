@@ -3,13 +3,16 @@
 .container {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: space-around;
 	height: 100px;
 }
 
 .social {
 	display: flex;
 	gap: 10px;
+	flex: 1;
+}
+.bloglink {
 	flex: 1;
 }
 

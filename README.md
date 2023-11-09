@@ -2,12 +2,15 @@
 
 # Next.js 이용한 블로그
 
+# 전체구조 및 계획
+
 ![blog](https://user-images.githubusercontent.com/30681841/281118817-a11df869-fbbb-482a-9f85-688dd3a6ea69.png)
 
-# Prisma 설치
+## Prisma 설치
 
 > Node.js 기반 ORM <br/>
-> 스프링부트에서의 JPA, Hibernate 를 생각하면 된다.
+> 스프링부트에서의 JPA, Hibernate 를 생각하면 된다. <br/>
+> MongoDB 등 여러 NoSQL 데이터베이스와 연결해서 사용할 수 있다.
 
 [공식](https://authjs.dev/reference/adapter/prisma)
 
@@ -29,13 +32,13 @@ npx primsa generate
 
 ## prisma studio 이용
 
-prisma studio 라는 GUI 를 지원한다.
+`prisma studio` 라는 GUI 를 지원한다.
 
 ```bash
 npx prisma studio
 ```
 
-위 명령어 실행 시, `localhost:5555` 에서 CRUD 작업을 할 수 있다.
+위 명령어 실행 시, `localhost:5555` 에서 기본적인 CRUD 작업을 할 수 있다.
 
 `schema.prisma` 을 작성한 뒤 `npx prisma generate` 명령어로 모델과 컬렉션을 생성한다.
 
@@ -47,7 +50,7 @@ npx prisma studio
 
 아직은 모든게 생소해서 정리를 해보자면,
 
--   `adapter` 패턴으로 여러 종류의 DB 와 Connection 을 지원한다.
+-   `adapter` 패턴으로 여러 종류의 DB Connection 을 지원한다.
     -   여기선 `MongoDB` 와 연결한다.
     -   `.env` 파일에 `MongoDB Atlas` 에서 제공하는 url 을 적는다.
     -   `mongodb+srv://<username>:<password>@cluster0.tjhl874.mongodb.net/?retryWrites=true&w=majority`
@@ -87,15 +90,15 @@ api
     └── route.js
 ```
 
-왜냐면 Next.js 가 route.js 라는 특정한 파일을 통해서 HTTP 통신을 담당하는 핸들러를 생성하도록 만들었기 때문이다.
+왜냐면 `Next.js` 가 `route.js` 라는 특정한 파일을 통해서 HTTP 처리를 담당하는 객체를 생성하도록 만들었기 때문이다.
 
-따라서, `app/api/...` 경로로 폴더를 생성한 뒤, route.js 파일을 생성해 GET, POST 등의 async 메서드를 만들면 된다.
+따라서, `app/api/...` 경로로 폴더를 생성한 뒤, `route.js` 파일을 생성해 GET, POST 등의 메서드를 만들면 된다.
 
 [route.js 에 관한 Next.js 공식 가이드](https://nextjs.org/docs/app/api-reference/file-conventions/route) 를 참고한다.
 
 ### 메서드 호출
 
-위에서 정의한 HTTP 핸들러 객체를 다른 곳에서 호출해서 사용해보자.
+위에서 정의한 GET 객체를 다른 곳에서 호출해서 사용해보자.
 
 ```javascript
 const getData = async () => {
@@ -113,7 +116,7 @@ const getData = async () => {
 
 ### 페이징
 
-Post 를 불러올 때는 페이지를 고려해야 한다. 따라서, 페이지를 계산할 간단한 로직을 첨가해야한다.
+`Post` 를 불러올 때는 페이지를 고려해야 한다. 따라서, 페이지를 계산할 간단한 로직을 첨가한다.
 
 ```javascript
 const { posts, count } = await getData(page);
@@ -124,7 +127,7 @@ const hasPrev = POST_PER_PAGE * (page - 1) > 0;
 const hasNext = POST_PER_PAGE * (page - 1) + POST_PER_PAGE < count;
 ```
 
-Post 에 쿼리를 요청할 때, 쿼리가 **_총 2번_** 나가야 한다.
+`Post` 에 쿼리를 요청할 때, 쿼리가 **_총 2번_** 나가야 한다.
 
 1. 페이지 전체 개수를 구하는 쿼리
 2. 현재 페이지, 페이지 당 보여줄 개수 를 계산해서 그 만큼한 데이터 요청
@@ -154,6 +157,8 @@ export const GET = async (req) => {
 
 ### 카테고리 검색 추가
 
+> where 절안에 카테고리가 파라미터로 넘어왔을 때만 검색되도록 한다.
+
 ```javascript
 const query = {
 	take: POST_PER_PAGE,
@@ -179,21 +184,7 @@ npm -i swr
 -   SSR, SSG
 -   Cache
 
-### 기본 사용법
-
-```javascript
-import useSWR from 'swr';
-
-function Profile() {
-	const { data, error, isLoading } = useSWR('/api/user', fetcher);
-
-	if (error) return <div>failed to load</div>;
-	if (isLoading) return <div>loading...</div>;
-	return <div>hello {data.name}!</div>;
-}
-```
-
-## 댓글 검색
+### swr 이용 - 댓글 검색
 
 > 특정한 게시물에 작성된 댓글을 검색
 
@@ -213,11 +204,163 @@ export const GET = async (req) => {
 			include: { user: true },
 		});
 }
+
+// /components/comment/Comments.jsx
+import useSWR from 'swr';
+
+const fetcher = async (url) => {
+	const res = await fetch(url);
+
+	const data = await res.json();
+
+	if (!res.ok) {
+		const error = new Error(data.message);
+		throw error;
+	}
+
+	return data;
+};
+
+const Comments = ({ postSlug }) => {
+	// ...
+	const { data, mutate, isLoading } = useSWR(
+		`http://localhost:3000/api/comments?postSlug=${postSlug}`,
+		fetcher
+	);
+	const [desc, setDesc] = useState('');
+
+	const handleSubmit = async () => {
+		await fetch('/api/comments', {
+			method: 'POST',
+			body: JSON.stringify({ desc, postSlug }),
+		});
+		mutate();
+	};
+
+	return (
+		// ...
+	)
+}
 ```
 
-### npx prisma generate
+### 댓글 작성
 
-![image](https://user-images.githubusercontent.com/30681841/281375961-f3a09b00-d520-45ad-a208-e891be5d7330.png)
+```javascript
+const Comments = ({ postSlug }) => {
+	const { status } = useSession();
+
+	const { data, mutate, isLoading } = useSWR(
+		`http://localhost:3000/api/comments?postSlug=${postSlug}`,
+		fetcher
+	);
+
+	const [desc, setDesc] = useState('');
+
+	const handleSubmit = async () => {
+		await fetch('/api/comments', {
+			method: 'POST',
+			body: JSON.stringify({ desc, postSlug }),
+		});
+		mutate();
+	};
+};
+```
+
+swr 에서 제공하는 `mutate` 를 사용했다.
+
+`const data = mutate(key, data, option);`
+
+swr, tanstack 등 로컬 캐시를 관리하는 라이브러리 중 가장 중요한 것이 언제 이전 캐시를 날리고 새로운 데이터로 업데이트 할 건가? 인 것 같다.
+
+`mutate` 인자 중 첫번째 key 값으로 대상을 지목한다.
+
+위 상황처럼 `mutate()` 로 작성하면, fetch 작업과 동시에 데이터를 revalidate 한다고 한다. 공식문서를 보면, 이미 data 라는 객체로 pre-bound 되어 있기 때문에 굳이 적어주지 않아도 된다고 한다.
+
+[관련 블로그](https://velog.io/@sinclairr/next-swr-2) 를 보고 배울 수 있었다.
+
+### 게시글 삭제(추가)
+
+간단한 CRUD 작업 중 삭제 에서 잠시 막혔다. 삭제버튼을 따로 컴포넌트로 만들었다.
+
+```javascript
+// components/deleteButton/DeleteButton.jsx
+const DeleteButton = ({ slug }) => {
+	const router = useRouter();
+	const handleDelete = async (slug) => {
+		try {
+			const res = await fetch(`/api/posts/${slug}`, {
+				method: 'DELETE',
+			});
+			if (res.ok) router.push('/');
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
+	return <button onClick={() => handleDelete(slug)}>Delete this Post</button>;
+};
+
+// app/api/posts/[slug]/route.js
+// DELETE A SINGLE POST
+export const DELETE = async (req, { params }) => {
+	const slug = params.slug;
+	try {
+		await prisma.post.delete({
+			where: { slug },
+		});
+		return new NextResponse(JSON.stringify({ status: 200 }));
+	} catch (err) {
+		console.log(err);
+		return new NextResponse(
+			JSON.stringify(
+				{ message: 'Something went wrong!' },
+				{ status: 500 }
+			)
+		);
+	}
+};
+```
+
+여기서 하나 알게 된 사실은 ORM 의 사용목적처럼, Post 는 Comment 와 관계가 맺어져있다. 따라서 아래 오류는 당연했다.
+
+```bash
+The change you are trying to make would violate the required relation 'CommentToPost' between the `Comment` and `Post` models.
+    at Cn.handleRequestError (/Users/jeongjin/Documents/Github/nextjs_blog/node_modules/@prisma/client/runtime/library.js:123:6817)
+    at Cn.handleAndLogRequestError (/Users/jeongjin/Documents/Github/nextjs_blog/node_modules/@prisma/client/runtime/library.js:123:6206)
+    at Cn.request (/Users/jeongjin/Documents/Github/nextjs_blog/node_modules/@prisma/client/runtime/library.js:123:5926)
+    at async l (/Users/jeongjin/Documents/Github/nextjs_blog/node_modules/@prisma/client/runtime/library.js:128:9968)
+    at async DELETE (webpack-internal:///(rsc)/./app/api/posts/[slug]/route.js:44:9)
+    at async /Users/jeongjin/Documents/Github/nextjs_blog/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:62499 {
+  code: 'P2014',
+  clientVersion: '5.5.2',
+  meta: {
+    relation_name: 'CommentToPost',
+    model_a_name: 'Comment',
+    model_b_name: 'Post'
+  }
+}
+```
+
+`Spring Data Jpa` 와 형태만 다르지 기능은 동일하다.
+
+<script src="https://gist.github.com/valorjj/3ff2ef8b41f8fcbc4033099be89c3c95.js"></script>
+
+schema.prism 파일에서 다음 옵션을 주면된다.
+
+```prisma
+model Comment {
+  id        String   @id @default(cuid()) @map("_id")
+  createdAt DateTime @default(now())
+  desc      String
+  userEmail String
+  user      User     @relation(fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  postSlug  String
+  post      Post     @relation(fields: [postSlug], references: [slug], onDelete: Cascade, onUpdate: Cascade)
+}
+```
+
+자세한 사항은 [공식문서](https://www.prisma.io/docs/concepts/components/prisma-schema/relations/referential-actions) 를 참조하면 된다.
+한가지 특이한 점은 SetNull, SetDefault 가 존재한다는 점이다. 말 그대로 참조하는 값을 Null 이나 Default 값으로 변경한다는 옵션이 존재한다는 점이 흥미로웠다.
 
 ## Vercel 배포 (진행중)
 
@@ -272,7 +415,7 @@ const WritePage = () => {
 };
 ```
 
-### 관련 메모
+#### 관련 메모
 
 아래 방법은 문제를 해결하지 못했다.
 
@@ -323,3 +466,5 @@ Digest: 956933652
     -   `openssl rand -base64 32` 터미널에서 입력하거나
     -   [https://generate-secret.vercel.app/32](https://generate-secret.vercel.app/32) 해당 주소를 방문하면 얻을 수 있다.
     -   예제는 [깃허브 링크](https://github.com/nextauthjs/next-auth-example) 에서 확인할 수 있다.
+
+그러나 여전히 문제는 그대로이다.

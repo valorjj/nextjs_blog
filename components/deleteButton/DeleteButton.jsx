@@ -8,16 +8,16 @@ const DeleteButton = ({ slug }) => {
 	const router = useRouter();
 	const handleDelete = async (slug) => {
 		try {
-			await fetch(`/api/posts/${slug}`, {
+			const res = await fetch(`/api/posts/${slug}`, {
 				method: 'DELETE',
 			});
-			router.push('/');
+			if (res.ok) router.push('/');
 		} catch (e) {
 			console.log(e);
 		}
 	};
 
-	return <button onClick={() => handleDelete(slug)}>Delete Button</button>;
+	return <button onClick={() => handleDelete(slug)}>Delete this Post</button>;
 };
 
 export default DeleteButton;

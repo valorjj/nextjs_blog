@@ -1,17 +1,17 @@
 /** @format */
 
-import React from "react";
-import styles from "./navbar.module.css";
-import Image from "next/image";
-import Link from "next/link";
-import ThemeToggle from "../themeToggle/ThemeToggle";
-import Auth from "../auth/AuthLinks";
+import React from 'react';
+import styles from './navbar.module.css';
+import Image from 'next/image';
+import Link from 'next/link';
+import ThemeToggle from '../themeToggle/ThemeToggle';
+import Auth from '../auth/AuthLinks';
 
 export default function Navbar() {
 	return (
 		<div className={styles.container}>
 			<div className={styles.social}>
-				<Image
+				{/* <Image
 					src='/facebook.png'
 					alt='facebook'
 					width={24}
@@ -22,9 +22,15 @@ export default function Navbar() {
 					alt='youtube'
 					width={24}
 					height={24}
-				/>
+				/> */}
 			</div>
-			<div className={styles.logo}>jeongjin blog</div>
+			<Link
+				href='/'
+				className={styles.bloglink}
+			>
+				<div className={styles.logo}>JJ blog</div>
+			</Link>
+
 			<div className={styles.links}>
 				<ThemeToggle />
 				<Link

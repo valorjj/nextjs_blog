@@ -1,15 +1,15 @@
 /** @format */
 
-import React from "react";
-import styles from "./categorylist.module.css";
-import Link from "next/link";
-import Image from "next/image";
+import React from 'react';
+import styles from './categorylist.module.css';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const getData = async () => {
-	const response = await fetch("http://localhost:3000/api/categories", {
-		cache: "no-store",
+	const response = await fetch('http://localhost:3000/api/categories', {
+		cache: 'no-store',
 	});
-	if (!response.ok) throw new Error("Failed");
+	if (!response.ok) throw new Error('Failed');
 	return response.json();
 };
 
