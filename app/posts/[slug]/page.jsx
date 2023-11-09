@@ -1,18 +1,19 @@
 /** @format */
 
-import Menu from "@/components/Menu/Menu";
-import styles from "./singlePage.module.css";
-import Image from "next/image";
-import Comments from "@/components/comments/Comments";
-import DeleteButton from "@/components/deleteButton/DeleteButton";
+import Menu from '@/components/menu/Menu';
+import styles from './singlepage.module.css';
+import Image from 'next/image';
+import Comments from '@/components/comments/Comments';
+import DeleteButton from '@/components/deleteButton/DeleteButton';
+
 
 const getData = async (slug) => {
 	const res = await fetch(`http://localhost:3000/api/posts/${slug}`, {
-		cache: "no-store",
+		cache: 'no-store',
 	});
 
 	if (!res.ok) {
-		throw new Error("Failed");
+		throw new Error('Failed');
 	}
 
 	return res.json();
