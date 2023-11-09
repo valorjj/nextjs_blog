@@ -1,31 +1,32 @@
 /** @format */
 
-import React from "react";
-import styles from "./singlepage.module.css";
-import Menu from "@/components/menu/Menu";
+import Menu from "@/components/Menu/Menu";
+import styles from "./singlePage.module.css";
 import Image from "next/image";
 import Comments from "@/components/comments/Comments";
+import DeleteButton from "@/components/deleteButton/DeleteButton";
 
 const getData = async (slug) => {
-	const response = await fetch(`http://localhost:3000/api/posts/${slug}`, {
+	const res = await fetch(`http://localhost:3000/api/posts/${slug}`, {
 		cache: "no-store",
 	});
-	if (!response.ok) {
+
+	if (!res.ok) {
 		throw new Error("Failed");
 	}
-	return response.json();
+
+	return res.json();
 };
 
 const SinglePage = async ({ params }) => {
 	const { slug } = params;
-
 	const data = await getData(slug);
 
 	return (
 		<div className={styles.container}>
 			<div className={styles.infoContainer}>
 				<div className={styles.textContainer}>
-					<h1 className={styles.title}>{data.title}</h1>
+					<h1 className={styles.title}>{data?.title}</h1>
 					<div className={styles.user}>
 						{data?.user?.image && (
 							<div className={styles.userImageContainer}>
@@ -41,10 +42,7 @@ const SinglePage = async ({ params }) => {
 							<span className={styles.username}>
 								{data?.user.name}
 							</span>
-							<span className={styles.date}>
-								{" "}
-								- {data.createdAt}
-							</span>
+							<span className={styles.date}>01.01.2024</span>
 						</div>
 					</div>
 				</div>
@@ -67,6 +65,9 @@ const SinglePage = async ({ params }) => {
 					/>
 					<div className={styles.comment}>
 						<Comments postSlug={slug} />
+					</div>
+					<div className={styles.delete}>
+						<DeleteButton slug={slug} />
 					</div>
 				</div>
 				<Menu />
