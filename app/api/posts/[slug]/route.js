@@ -26,3 +26,9 @@ export const GET = async (req, { params }) => {
 		);
 	}
 };
+
+// DELETE A SINGLE POST
+export const DELETE = async (req, { params }) => {
+	const { slug } = params;
+	console.log(req);
+};
