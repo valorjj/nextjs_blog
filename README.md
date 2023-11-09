@@ -99,12 +99,12 @@ api
 
 ```javascript
 const getData = async () => {
-	const response = await fetch("/api.categories", {
-		cache: "no-store",
+	const response = await fetch('/api.categories', {
+		cache: 'no-store',
 	});
 
 	if (!response.ok) {
-		throw new Error("Failed");
+		throw new Error('Failed');
 	}
 
 	return response.json();
@@ -182,10 +182,10 @@ npm -i swr
 ### 기본 사용법
 
 ```javascript
-import useSWR from "swr";
+import useSWR from 'swr';
 
 function Profile() {
-	const { data, error, isLoading } = useSWR("/api/user", fetcher);
+	const { data, error, isLoading } = useSWR('/api/user', fetcher);
 
 	if (error) return <div>failed to load</div>;
 	if (isLoading) return <div>loading...</div>;
@@ -201,7 +201,7 @@ function Profile() {
 // /app/api/comments/route.js
 export const GET = async (req) => {
 	const { searchParams } = new URL(req.url);
-	// 특정 페이지 번호를 쿼리에서 가져온다. 
+	// 특정 페이지 번호를 쿼리에서 가져온다.
 	const postSlug = searchParams.get("postSlug");
 
 	try {
@@ -221,17 +221,73 @@ export const GET = async (req) => {
 
 ## Vercel 배포 (진행중)
 
-여러 삽질 중, 아래 오류를 만났다.
+### 문제1
+
+`prisma` 와 `mongodb` 연결이 안된다. deploy 로그를 살펴보니, production 으로 빌드할 시 `vercel-build` 명령어를 실행한다는 것을 확인했다. 따라서, 해당 명령어를 추가했다.
+
+### 해결
+
+```javascript
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"vercel-build": "npx prisma generate && next build"
+	},
+```
+
+### 문제2
 
 ```bash
 Error occurred prerendering page "/write". Read more: https://nextjs.org/docs/messages/prerender-error
 ```
 
-`ReactQuill` 이라는 라이브러리를 사용하여 글 작성하는 페이지인데, 오류가 난다. 폭풍 검색을 통해 ReactQuill 은 document 를 조작하는데 Next.js 에서 pre-rendering 되는 값이 중간에 바뀌기 때문에 오류를 출력한다.
+`ReactQuill` 이라는 라이브러리를 사용하여 글 작성하는 페이지인데, 오류가 난다. 검색을 통해 `ReactQuill` 은 `document` 를 조작하는데 `Next.js` 에서 pre-rendering 되는 값이 중간에 바뀌기 때문에 오류를 출력한다.
 
-따라서, 모든 요소가 로드된 이후에 ReactQuill 을 불러오도록 하면 된다. 
+따라서, 모든 요소가 로드된 이후에 `ReactQuill` 을 불러오도록 하면 된다. 검색을 통해 여러 방법이 있다는 것을 알게되었다.
 
-## 배포 결과
+-   `ReactQuill` 호출하는 코드를 컴포넌트로 따로 분리한다.
+    -   `useMeme`, `useRef` 등을 사용한다.
+    -   CSR, SSR 분리가 필요할 때는 이 방법을 사용하면 된다.
+-   `next/dynamic` 를 사용한다.
+    -   `React.lazy()` + `Suspense` 가 적용되어 있어, 최초 html 이 렌더링 된 이후에 요소를 불러온다.
+
+### 해결
+
+```javascript
+const WritePage = () => {
+	// ...
+	const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+	// ...
+	return (
+		<ReactQuill
+			className={styles.textArea}
+			theme='bubble'
+			value={value}
+			onChange={setValue}
+			placeholder='Tell your story...'
+		/>
+	);
+};
+```
+
+### 관련 메모
+
+아래 방법은 문제를 해결하지 못했다.
+
+```javascript
+// 1.
+{typeof window !== object ? ... : ...}
+// 2.
+{typeof document !== undefined ? ... : ...}
+
+```
+
+### 배포결과
+
+document 관련 문제를 해결하니, vercel 을 통한 배포는 정상적으로 진행되었다.
+
 ```bash
 Route (app)                              Size     First Load JS
 ┌ λ /                                    1.26 kB        97.5 kB
@@ -246,3 +302,24 @@ Route (app)                              Size     First Load JS
 ├ λ /posts/[slug]                        6.93 kB         114 kB
 └ ○ /write                               20.9 kB         121 kB
 ```
+
+### 문제3
+
+마지막 관문으로, `next-auth` 적용이 문제였다. 소셜 로그인을 위해 `process.env.NEXTAUTH_URL`, `process.env.NEXTAUTH_SECRET` 두 환경변수를 넘겨줘야 했다. `valorjj-code.vercel.app` 로 도메인을 하나 생성하고, 구글의 redirect url, NEXTAUTH_URL 에도 포함시켰다.
+
+```bash
+Application error: a server-side exception has occurred (see the server logs for more information).
+Digest: 956933652
+```
+
+#### 공식문서 참고
+
+[배포 관련 공식문서](https://next-auth.js.org/deployment) 를 다시 읽었다.
+
+여기서 알려주는 사실은 다음과 같다
+
+-   `NEXTAUTH_URL` 이 더 이상 필요하지 않다.
+-   `NEXTAUTH_SECRET` 에는 `base64` 로 인코딩된 값이 필요하다.
+    -   `openssl rand -base64 32` 터미널에서 입력하거나
+    -   [https://generate-secret.vercel.app/32](https://generate-secret.vercel.app/32) 해당 주소를 방문하면 얻을 수 있다.
+    -   예제는 [깃허브 링크](https://github.com/nextauthjs/next-auth-example) 에서 확인할 수 있다.
