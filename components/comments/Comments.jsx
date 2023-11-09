@@ -1,13 +1,13 @@
 /** @format */
 
-"use client";
+'use client';
 
-import Link from "next/link";
-import styles from "./comments.module.css";
-import Image from "next/image";
-import useSWR from "swr";
-import { useSession } from "next-auth/react";
-import { useState } from "react";
+import Link from 'next/link';
+import styles from './comments.module.css';
+import Image from 'next/image';
+import useSWR from 'swr';
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
 
 const fetcher = async (url) => {
 	const res = await fetch(url);
@@ -30,11 +30,11 @@ const Comments = ({ postSlug }) => {
 		fetcher
 	);
 
-	const [desc, setDesc] = useState("");
+	const [desc, setDesc] = useState('');
 
 	const handleSubmit = async () => {
-		await fetch("/api/comments", {
-			method: "POST",
+		await fetch('/api/comments', {
+			method: 'POST',
 			body: JSON.stringify({ desc, postSlug }),
 		});
 		mutate();
@@ -43,7 +43,7 @@ const Comments = ({ postSlug }) => {
 	return (
 		<div className={styles.container}>
 			<h1 className={styles.title}>Comments</h1>
-			{status === "authenticated" ? (
+			{status === 'authenticated' ? (
 				<div className={styles.write}>
 					<textarea
 						placeholder='write a comment...'
@@ -62,7 +62,7 @@ const Comments = ({ postSlug }) => {
 			)}
 			<div className={styles.comments}>
 				{isLoading
-					? "loading"
+					? 'loading'
 					: data?.map((item) => (
 							<div
 								className={styles.comment}

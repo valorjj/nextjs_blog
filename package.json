@@ -27,7 +27,8 @@
 		"react-dom": "^18",
 		"react-quill": "^2.0.0",
 		"swr": "^2.2.4",
-		"userland": "^0.4.1"
+		"userland": "^0.4.1",
+		"encoding": "^0.1.13"
 	},
 	"devDependencies": {
 		"encoding": "^0.1.13",

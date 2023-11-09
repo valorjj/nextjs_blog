@@ -1,7 +1,7 @@
 /** @format */
 
-import prisma from "@/utils/connect";
-import { NextResponse } from "next/server";
+import prisma from '@/utils/connect';
+import { NextResponse } from 'next/server';
 
 // GET SINGLE POST
 export const GET = async (req, { params }) => {
@@ -20,7 +20,7 @@ export const GET = async (req, { params }) => {
 		console.log(err);
 		return new NextResponse(
 			JSON.stringify(
-				{ message: "Something went wrong!" },
+				{ message: 'Something went wrong!' },
 				{ status: 500 }
 			)
 		);
@@ -29,6 +29,19 @@ export const GET = async (req, { params }) => {
 
 // DELETE A SINGLE POST
 export const DELETE = async (req, { params }) => {
-	const { slug } = params;
-	console.log(req);
+	const slug = params.slug;
+	try {
+		await prisma.post.delete({
+			where: { slug },
+		});
+		return new NextResponse(JSON.stringify({ status: 200 }));
+	} catch (err) {
+		console.log(err);
+		return new NextResponse(
+			JSON.stringify(
+				{ message: 'Something went wrong!' },
+				{ status: 500 }
+			)
+		);
+	}
 };

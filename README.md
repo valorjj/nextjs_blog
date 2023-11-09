@@ -303,7 +303,7 @@ Route (app)                              Size     First Load JS
 └ ○ /write                               20.9 kB         121 kB
 ```
 
-### 문제3
+### 문제3 (해결중)
 
 마지막 관문으로, `next-auth` 적용이 문제였다. 소셜 로그인을 위해 `process.env.NEXTAUTH_URL`, `process.env.NEXTAUTH_SECRET` 두 환경변수를 넘겨줘야 했다. `valorjj-code.vercel.app` 로 도메인을 하나 생성하고, 구글의 redirect url, NEXTAUTH_URL 에도 포함시켰다.
 
